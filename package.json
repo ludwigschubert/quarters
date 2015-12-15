@@ -1,0 +1,63 @@
+{
+  "name": "quarters",
+  "version": "1.0.0",
+  "description": "Quarters, yet another Stanford course planner",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --hot --progress --colors",
+    "build": "webpack --hot --progress --colors",
+    "deploy": "npm run build && parse deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ludwigschubert/quarters.git"
+  },
+  "author": "Ludwig Schubert",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ludwigschubert/quarters/issues"
+  },
+  "homepage": "https://github.com/ludwigschubert/quarters#readme",
+  "devDependencies": {
+    "babel-core": "^6.3.17",
+    "babel-loader": "*",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
+    "bootstrap-sass": "^3.3.6",
+    "bootstrap-sass-loader": "^1.0.9",
+    "classnames": "^2.2.1",
+    "css-loader": "^0.23.0",
+    "file-loader": "^0.8.5",
+    "history": "^1.13.1",
+    "html-webpack-plugin": "^2.1.0",
+    "imports-loader": "^0.6.5",
+    "jquery": "^2.1.4",
+    "moment": "^2.10.6",
+    "node-sass": "^3.4.2",
+    "parse": "^1.6.9",
+    "parse-react": "^0.5.0",
+    "postal": "^1.0.7",
+    "postal-react-mixin": "^1.0.3",
+    "pubnub": "^3.7.18",
+    "react": "^0.14.3",
+    "react-addons-linked-state-mixin": "^0.14.3",
+    "react-bootstrap": "^0.28.1",
+    "react-dom": "^0.14.3",
+    "react-hot-loader": "^1.3.0",
+    "react-redux": "^4.0.1",
+    "react-time": "^4.0.0",
+    "redux": "^3.0.5",
+    "sass-loader": "^3.1.2",
+    "style-loader": "*",
+    "twilio": "^2.7.0",
+    "url-loader": "*",
+    "webpack": "^1.12.9",
+    "webpack-dev-server": "^1.14.0"
+  },
+  "babel": {
+    "presets": [
+      "react",
+      "es2015"
+    ]
+  }
+}
