@@ -1,72 +1,50 @@
-require('cloud/app.js');
-const twilio = require("twilio");
+// if you need a server:
+// require('cloud/app.js');
 
 // Data Consistency
 
-Parse.Cloud.beforeSave("Message", function(request, response) {
-  const message = request.object;
-  if (!message.get("patron")) {
-    response.error("Every Message must have a patron assigned.");
-  } else {
-    response.success();
-  }
-});
 
-Parse.Cloud.beforeSave("Patron", function(request, response) {
-  const patron = request.object;
-  if (!patron.get("phoneNumber")) {
-    response.error("Every Patron must have a phone number assigned.");
-  } else {
-    response.success();
-  }
-});
+// Jobs
 
+var explorecourses = require('cloud/explorecourses.js')
 
-// Update Notifications
+Parse.Cloud.job("importCourses", function(request, status) {
 
-Parse.Cloud.afterSave("Message", function(request, response) {
-  const message = request.object;
-  Parse.Cloud.httpRequest({
-    url: 'https://pubsub.pubnub.com/publish/pub-c-a0daec15-afc0-4588-9b0a-e419807f5882/sub-c-17e1a790-9737-11e5-b829-02ee2ddab7fe/0/new-message/0/%22' + message.id + '%22',
-    success: function(httpResponse) {
-      console.log("Sent Push for new message " + message.id);
-      console.log(httpResponse.text);
-    },
-    error: function(httpResponse) {
-      console.error('Request failed with response code ' + httpResponse.status);
-    }
-  });
+  explorecourses.getCoursesForQuery("CS103").then( function (courses) {
+    console.log("Got " + courses.length + " courses from API.");
+    var promises = [];
+    courses.forEach(function(course) {
+      var promise = new Parse.Promise();
 
-  if (message.get("isReply")) {
-    query = new Parse.Query("Patron");
-    query.get(message.get("patron").id, {
-      success: function(patron) {
-        twilio.initialize("ACdadc5e160dcf3b90e6ecdd1c0799c3ab","2f87472519ba1224f9376fdc0b1fb1c7");
-        twilio.sendSMS({
-          From: "+16503979734",
-          To: patron.get("phoneNumber"),
-          Body: message.get("text")
-        })
-        console.log("Sent Message via Twilio!");
-      },
-      error: function(error) {
-        console.error("Got an error " + error.code + " : " + error.message);
-      }
+      console.log("Importing Course '" + course.title + "'.");
+      courseQuery = new Parse.Query("Course");
+      courseQuery.equalTo("subject", course.subject);
+      courseQuery.equalTo("code", course.subject);
+      courseQuery.first().then(function (courseObject) {
+        if (!courseObject) {
+          console.log("Creating new course '" + course.title + "'.");
+          courseObject = new Parse.Object("Course");
+        }
+        courseObject.set("subject", course.subject);
+        courseObject.set("code", course.code);
+        courseObject.set("title", course.title);
+        courseObject.set("description", course.description);
+        courseObject.set("repeatable", course.repeatable);
+        courseObject.set("grading", course.grading);
+        courseObject.set("minUnits", course.unitsMin);
+        courseObject.set("maxUnits", course.unitsMax);
+        courseObject.save().then(function(){
+          promise.resolve();
+        });
+      }, function () {
+        promise.reject();
+      });
+
+      promises.push(promise);
     });
-  }
-
-});
-
-Parse.Cloud.afterSave("Patron", function(request, response) {
-  const patron = request.object;
-  Parse.Cloud.httpRequest({
-    url: 'https://pubsub.pubnub.com/publish/pub-c-a0daec15-afc0-4588-9b0a-e419807f5882/sub-c-17e1a790-9737-11e5-b829-02ee2ddab7fe/0/new-patron/0/%22' + patron.id + '%22',
-    success: function(httpResponse) {
-      console.log("Sent Push for new message " + patron.id);
-      console.log(httpResponse.text);
-    },
-    error: function(httpResponse) {
-      console.error('Request failed with response code ' + httpResponse.status);
-    }
+    return Parse.Promise.when(promises);
+  }).then(function () {
+    status.success("Imported all Courses in query result.")
   });
+
 });

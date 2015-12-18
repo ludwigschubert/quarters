@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "Quarters": {
+      "applicationId": "ky5FqpHAqX49VIW1wH7oXzEP2LCgebYEvDYUIEpG"
+    },
+    "_default": {
+      "link": "Quarters"
+    }
+  }
+}

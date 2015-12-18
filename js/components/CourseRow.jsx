@@ -11,8 +11,8 @@ let CourseRow = React.createClass({
 
     return(
       <tr>
-        <td>{course.number}</td>
-        <td>{course.name}</td>
+        <td>{[course.subject, course.code].join(" ")}</td>
+        <td>{course.title}</td>
         <td>nothing</td>
       </tr>
     );
